@@ -4,10 +4,8 @@ import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import { isBrowserRunning } from '../lib/browser.js';
+import { BRAVE_PATH } from '../lib/config.js';
 import { startServer } from './mcp-client.js';
-
-const BRAVE_PATH =
-  process.env.BRAVE_PATH || 'C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe';
 
 if (!fs.existsSync(BRAVE_PATH)) {
   console.log('[INFO] Brave is not installed. Skipping replay test.');

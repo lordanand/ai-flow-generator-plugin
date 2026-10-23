@@ -2,7 +2,11 @@
   "name": "playwright-brave-mcp",
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
+    "check": "node scripts/check-deps.js",
     "open": "node bin/open-brave.js",
     "open:ads": "node bin/open-ads.js",
     "docs": "start web/index.html",
@@ -13,7 +17,8 @@
     "test:execute": "node tests/test-execute.js",
     "test:template": "node tests/test-template.js",
     "test:state": "node tests/test-run-state.js",
-    "test:replay": "node tests/test-replay.js"
+    "test:replay": "node tests/test-replay.js",
+    "test:deps": "node tests/test-check-deps.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.0",

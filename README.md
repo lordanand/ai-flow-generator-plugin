@@ -12,11 +12,22 @@ Minimal, lightweight automation setup using `playwright-core` with Brave browser
 
 This folder is also a Claude Code plugin. `/run-flow-recorder` fills a multi-step form once for **every row** of a CSV:
 
-1. Asks for anything you didn't pass: CSV path, steps JS path, browser (`brave`, or `adspower` with one or more profile ids), URL, and which page is the last step.
-2. For each row it opens a **new** browser (AdsPower uses the next profile id, and asks for another when the list runs out), replays the steps already saved in the JS file, and records any page that has no saved step yet.
-3. The last step is saved with `success: true`. Reaching it ends the row, and the browser is closed.
-4. Progress is saved to `<steps file>.progress.json` after every step and row. Run the command again with the same files to resume.
-5. When every row is done or skipped, it runs the Verify Detectors prompt (`docs/verify-detector.md`) on the steps file and saves the result back to it, then the Pointer → Touch Converter prompt (`docs/touch-converter.md`), which writes `<name>-touch.js` next to it.
+1. Checks the requirements first: Node.js (version from `engines` in `package.json`), npm, every npm package, and then Brave or AdsPower. If anything is missing, it asks whether you'll install it or it should, and only starts once everything is ready.
+2. Asks for anything you didn't pass: CSV path, steps JS path, browser (`brave`, or `adspower` with one or more profile ids), URL, and which page is the last step.
+3. For each row it opens a **new** browser (AdsPower uses the next profile id, and asks for another when the list runs out), replays the steps already saved in the JS file, and records any page that has no saved step yet.
+4. The last step is saved with `success: true`. Reaching it ends the row, and the browser is closed.
+5. Progress is saved to `<steps file>.progress.json` after every step and row. Run the command again with the same files to resume.
+6. When every row is done or skipped, it runs the Verify Detectors prompt (`docs/verify-detector.md`) on the steps file and saves the result back to it, then the Pointer → Touch Converter prompt (`docs/touch-converter.md`), which writes `<name>-touch.js` next to it.
+
+### Requirements
+
+Node.js 18 or newer, the npm packages in `package.json`, and Brave or AdsPower (with its Local API on). Check them any time; this needs only Node, no packages:
+
+```bash
+npm run check -- --browser brave
+```
+
+It prints a JSON report and exits with 0 when everything is ready, 1 when something is missing (the `fix` list says what to do), or 2 for a bad argument. Use `--browser adspower` to check AdsPower's Local API instead.
 
 ### Install
 
@@ -53,14 +64,15 @@ The plugin starts the three MCP servers itself (declared under `mcpServers` in `
 .claude-plugin/plugin.json   plugin manifest + the MCP servers it starts
 skills/run-flow-recorder/    the /run-flow-recorder workflow (SKILL.md)
 servers/                     MCP servers: snapshot, execute, template
-lib/                         shared code: browser.js, template.js, run-state.js, steps-file.js
+lib/                         shared code: browser.js, config.js, template.js, run-state.js, steps-file.js
 bin/                         CLI launchers: open-brave.js, open-ads.js
+scripts/                     check-deps.js: requirements check (needs only Node)
 tests/                       test scripts, mcp-client.js and fixtures/ (run from the project root via npm scripts)
 docs/                        prompts: rules.md, prompt.md, prompt-new.md, verify-detector.md, touch-converter.md
 web/index.html               setup and prompts page
 ```
 
-Run tests from the project root: `npm test`, `npm run test:execute`, `npm run test:template`, `npm run test:state`, `npm run test:replay`.
+Run tests from the project root: `npm test`, `npm run test:execute`, `npm run test:template`, `npm run test:state`, `npm run test:replay`, `npm run test:deps`.
 
 ## Usage
 

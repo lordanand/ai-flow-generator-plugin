@@ -18,6 +18,7 @@ All paths are relative to the plugin root (two folders up from this skill):
 - `docs/rules.md` — locator priority, allowed actions, interaction rules. Read it before recording any step and follow it for every locator and action.
 - `docs/verify-detector.md` — the Verify Detectors prompt (phase 5).
 - `docs/touch-converter.md` — the Pointer → Touch Converter prompt (phase 6).
+- `scripts/check-deps.js` — the dependency check (phase 0). Run it with `node`; it needs no npm packages.
 
 ## Tools
 
@@ -26,6 +27,35 @@ All paths are relative to the plugin root (two folders up from this skill):
 - Data and progress: `replace_template`, `start_run`, `next_profile`, `add_profiles`, `mark_step`, `mark_row`, `mark_phase`, `get_run_state` (csv-template server).
 
 Always pass absolute paths for `csvPath` and `jsPath`.
+
+## Order
+
+The start is exactly three things, in this order: **check dependencies (phase 0) → ask for missing data (phase 1) → start the task (phase 2)**.
+
+Do not test the plugin before starting. Do not run its tests or npm scripts, call the tools to "try them", read the plugin's code, or open a browser to see whether it works. The dependency check is the only check.
+
+## 0. Check dependencies
+
+Run one command (if the browser is already in the arguments, add `--browser brave` or `--browser adspower`):
+
+```
+node "<plugin root>/scripts/check-deps.js"
+```
+
+It prints JSON with `ok`, `node`, `npm`, `packages`, `browser` (when asked) and `fix`.
+
+- **`ok: true`** → mention it in one short line at most and go to phase 1.
+- **`node` not found** (the command itself fails) → Node.js is missing.
+- **`ok: false`** → something is missing.
+
+If anything is missing, tell the user what, in plain words (for example "Node.js is not installed", "Node.js 16 is installed but 18 or newer is needed", "playwright-core is not installed", "Brave was not found"), and ask: **"Should I install these, or will you install them yourself?"**
+
+- **You install:** Node.js with `winget install --id OpenJS.NodeJS.LTS -e` on Windows or `brew install node` on macOS (the system package manager on Linux); packages with the command in `fix` (for example `npm ci --omit=dev`), run in `pluginRoot`; Brave with `winget install --id Brave.Brave -e` on Windows. AdsPower can't be installed or started for the user: ask them to start it and turn on its Local API (Settings > Local API).
+- **The user installs:** give them the exact commands or links (https://nodejs.org, https://brave.com), and wait until they say it is done.
+
+Then run the check again, until `ok: true`.
+
+If you installed Node.js or packages, the plugin's tools have to be reloaded before they work: ask the user to run `/reload-plugins` (or restart Claude Code) and then `/run-flow-recorder` again. If Node.js is still not found right after installing it, the new PATH needs a restart of Claude Code.
 
 ## 1. Collect inputs
 
@@ -38,7 +68,9 @@ Take what you can from the arguments, then ask in chat for each missing item, on
 4. **URL** — opened at the start of every row.
 5. **Last-step rule** — ask: "Which page or step is the last one, so I know the form is finished?" Using up all the row's data does not prove the form is done; only this rule does.
 
-Then call `get_run_state` for the JS path. If a run exists, show the user its phase, rows done / total, and failed rows, and ask: **resume** or **start over**. Start over passes `restart: true` to `start_run` (the steps file is kept).
+If the browser was not in the arguments, run the phase 0 command once more with `--browser brave` (or `adspower`) after the user answers, and handle anything missing the same way. If Brave is installed somewhere else, the user can set `BRAVE_PATH` to its `brave.exe` and restart Claude Code.
+
+Only when all five inputs are known, call `get_run_state` for the JS path. Never call any plugin tool while you are still waiting for an answer. If a run exists, show the user its phase, rows done / total, and failed rows, and ask: **resume** or **start over**. Start over passes `restart: true` to `start_run` (the steps file is kept).
 
 ## 2. Start the run
 
@@ -128,6 +160,8 @@ These apply to every field you fill, on every form:
 
 ## Hard rules
 
+- Never start a run until `scripts/check-deps.js` reports `ok: true`, including the browser check.
+- Never install Node.js, npm packages or a browser without first asking the user whether you or they will do it.
 - Never save a step before its trial run moved the page on.
 - Never add a step whose `detect` matches a step already in the file; reuse the saved one.
 - Never hardcode a CSV value in a saved step, and never invent a header.

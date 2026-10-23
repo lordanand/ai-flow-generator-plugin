@@ -1,0 +1,25 @@
+{
+  "name": "playwright-brave-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "open": "node bin/open-brave.js",
+    "open:ads": "node bin/open-ads.js",
+    "docs": "start web/index.html",
+    "mcp:snapshot": "node servers/snapshot-server.js",
+    "mcp:execute": "node servers/execute-server.js",
+    "mcp:template": "node servers/template-server.js",
+    "test": "node tests/test-mcp.js",
+    "test:execute": "node tests/test-execute.js",
+    "test:template": "node tests/test-template.js",
+    "test:state": "node tests/test-run-state.js",
+    "test:replay": "node tests/test-replay.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.0",
+    "handlebars": "^4.7.9",
+    "playwright-core": "^1.50.0",
+    "xlsx": "^0.18.5",
+    "zod": "^3.24.0"
+  }
+}

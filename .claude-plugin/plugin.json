@@ -1,0 +1,23 @@
+{
+  "name": "ai-flow-generator",
+  "version": "1.0.0",
+  "description": "Record and replay multi-step form flows over every CSV row in Brave or AdsPower, with resumable progress, detector verification and a touch-event script.",
+  "author": {
+    "name": "Aditya",
+    "email": "aditya@postessia.in"
+  },
+  "mcpServers": {
+    "brave-snapshot": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/servers/snapshot-server.js"]
+    },
+    "brave-execute": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/servers/execute-server.js"]
+    },
+    "csv-template": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/servers/template-server.js"]
+    }
+  }
+}

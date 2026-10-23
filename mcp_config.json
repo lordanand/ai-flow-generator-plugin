@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "brave-snapshot": {
+      "command": "node",
+      "args": ["servers/snapshot-server.js"]
+    },
+    "brave-execute": {
+      "command": "node",
+      "args": ["servers/execute-server.js"]
+    },
+    "csv-template": {
+      "command": "node",
+      "args": ["servers/template-server.js"]
+    }
+  }
+}

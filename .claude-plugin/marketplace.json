@@ -1,0 +1,15 @@
+{
+  "name": "ai-flow-generator-local",
+  "description": "Local marketplace for the ai-flow-generator form recorder plugin.",
+  "owner": {
+    "name": "Aditya",
+    "email": "aditya@postessia.in"
+  },
+  "plugins": [
+    {
+      "name": "ai-flow-generator",
+      "source": "./",
+      "description": "Record and replay multi-step form flows over every CSV row in Brave or AdsPower, with resumable progress, detector verification and a touch-event script."
+    }
+  ]
+}
